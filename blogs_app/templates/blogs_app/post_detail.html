@@ -1,6 +1,7 @@
 {% extends "blogs_app/base.html" %}
 {% load crispy_forms_tags %}
 {% load static %}
+{% load blog_extras %}
 
 {% block style %}
 <style>
@@ -42,7 +43,7 @@
             </div>
         
           <h2 class="article-title">{{ post.title }}</h2>
-          <p class="article-content">{{ post.content }}</p>
+          <p class="article-content">{{ post.content|convert_markdown|safe }}</p>
 
           <button type="submit" id="like_unlike_btn" name="unlike_button" class="btn btn-sm" status="{{ status }}" user_id="{{ user.pk }}" post_id="{{ post.pk }}">
             <i class="bi {% if status %}bi-star-fill{% else %}bi-star{% endif %}"></i>
