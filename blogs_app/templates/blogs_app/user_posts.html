@@ -1,8 +1,9 @@
 {% extends "blogs_app/base.html" %}
 {% block content %}
 <h1 class="mb-3"> Posts by {{ view.kwargs.username }} ({{ page_obj.paginator.count }}) </h1>
+
 	<!-- In Templates context data is accessed by keys -->
-	{% for post in posts %}
+    {% for post in posts %}
 	<article class="media content-section">
     <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
 		<div class="media-body">
@@ -12,6 +13,9 @@
             </div>
             <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
             <p class="article-content">{{ post.content }}</p>
+            {% for tag in post.tags.all %}
+                <a href="{% url 'posts_by_tag' tag.slug %}">{{tag.name}}</a>
+            {% endfor %}
         </div>
     </article>
 	{% endfor %}

@@ -15,6 +15,7 @@ pk=primary key
 urlpatterns = [
     path('', PostListView.as_view(), name="blog-home"),
     path('user/<str:username>/', UserPostListView.as_view(), name="user-posts"),
+    path('tags/<slug:tag_slug>/', views.TagIndexView.as_view(), name='posts_by_tag'),
 
     path('post/<int:pk>/', PostDetailView.as_view(), name="post-detail"),
     path('post/new/', PostCreateView.as_view(), name="post-create"),

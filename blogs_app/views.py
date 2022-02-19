@@ -5,14 +5,19 @@ from hitcount.views import HitCountDetailView
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Comment
-from .forms import CommentForm
+from .forms import PostForm, CommentForm
+from django.template import RequestContext
+from taggit.models import Tag
 
+from taggit.models import Tag
+from django.template.defaultfilters import slugify
 
 def home(request):
     """
     We use context to pass information to the home.html template.
     """
-    context = {'posts': post.objects.all()}
+    # context = {'posts': post.objects.all()}
+    context = {'posts': Post.objects.all()}
     return render(request, 'blogs_app/home.html', context)
 
 
@@ -112,12 +117,37 @@ def SearchPostList(request):
     return render(request, 'blogs_app/search_posts.html', context)
 
 
-class PostCreateView(LoginRequiredMixin, CreateView):
-    """
-    Run form validation after setting post author.
-    """
+class TagMixin(object):
+    def get_context_data(self, **kwargs):
+        context = super(TagMixin, self).get_context_data(**kwargs)
+        context['tags'] = Tag.objects.all()
+        return context
+
+
+class TagIndexView(TagMixin,ListView):
     model = Post
-    fields = ['title', 'content']
+    template_name = 'home.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        return Post.objects.filter(tags__slug=self.kwargs.get('tag_slug'))
+
+"""
+class PostCreateView(LoginRequiredMixin, CreateView):
+    # Run form validation after setting post author.
+    model = Post
+    # fields = ['title', 'content']
+    fields = ['title', 'content', 'tags']
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+"""
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    template_name = "blogs_app/post_form.html"
+    fields = ['title', 'content', 'tags']
 
     def form_valid(self, form):
         form.instance.author = self.request.user
